@@ -21,11 +21,18 @@ interface AuthProviderProps {
 export function useAuthState() {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
-  const isAuthenticated = !!user && AuthService.isAuthenticated();
+  const isAuthenticated = mounted && !!user && AuthService.isAuthenticated();
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    
     const checkAuth = async () => {
       try {
         if (AuthService.isAuthenticated()) {
@@ -48,7 +55,7 @@ export function useAuthState() {
     };
 
     checkAuth();
-  }, []);
+  }, [mounted]);
 
   const login = async (email: string, senha: string) => {
     try {

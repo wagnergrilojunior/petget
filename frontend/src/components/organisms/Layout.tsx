@@ -1,7 +1,8 @@
 'use client';
 
 import { ReactNode, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -32,26 +33,26 @@ interface LayoutProps {
 
 const menuItems = [
   { icon: Home, label: 'Dashboard', href: '/dashboard' },
-  { icon: Users, label: 'Clientes', href: '/clientes' },
-  { icon: Heart, label: 'Pets', href: '/pets' },
-  { icon: Calendar, label: 'Agenda', href: '/agenda' },
-  { icon: Package, label: 'Produtos', href: '/produtos' },
-  { icon: DollarSign, label: 'Financeiro', href: '/financeiro' },
-  { icon: Settings, label: 'Configurações', href: '/configuracoes' },
+  { icon: Users, label: 'Clientes', href: '/dashboard/clientes' },
+  { icon: Heart, label: 'Pets', href: '/dashboard/pets' },
+  { icon: Calendar, label: 'Agenda', href: '/dashboard/agenda' },
+  { icon: Package, label: 'Produtos', href: '/dashboard/produtos' },
+  { icon: DollarSign, label: 'Financeiro', href: '/dashboard/financeiro' },
+  { icon: Settings, label: 'Configurações', href: '/dashboard/configuracoes' },
 ];
 
 export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, clearAuth } = useAuthState();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = () => {
     clearAuth();
     router.push('/login');
   };
 
-  const handleNavigation = (href: string) => {
-    router.push(href);
+  const handleNavigation = () => {
     setSidebarOpen(false);
   };
 
@@ -102,7 +103,7 @@ export default function Layout({ children }: LayoutProps) {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleNavigation('/perfil')}>
+                <DropdownMenuItem onClick={() => router.push('/perfil')}>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Perfil</span>
                 </DropdownMenuItem>
@@ -127,16 +128,19 @@ export default function Layout({ children }: LayoutProps) {
             <nav className="flex-1 px-4 py-6 space-y-2">
               {menuItems.map((item) => {
                 const Icon = item.icon;
+                const isActive = pathname === item.href;
                 return (
-                  <Button
-                    key={item.href}
-                    variant="ghost"
-                    className="w-full justify-start text-left"
-                    onClick={() => handleNavigation(item.href)}
-                  >
-                    <Icon className="mr-3 h-5 w-5" />
-                    {item.label}
-                  </Button>
+                  <Link key={item.href} href={item.href} onClick={handleNavigation}>
+                    <Button
+                      variant={isActive ? "default" : "ghost"}
+                      className={`w-full justify-start text-left ${
+                        isActive ? "bg-blue-600 text-white hover:bg-blue-700" : ""
+                      }`}
+                    >
+                      <Icon className="mr-3 h-5 w-5" />
+                      {item.label}
+                    </Button>
+                  </Link>
                 );
               })}
             </nav>

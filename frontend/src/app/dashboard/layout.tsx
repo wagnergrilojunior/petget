@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Sidebar } from '@/components/organisms/Sidebar';
 import { Header } from '@/components/organisms/Header';
+import { SkipLinks } from '@/components/ui/skip-links';
 import { cn } from '@/lib/utils';
 
 interface DashboardLayoutProps {
@@ -14,11 +15,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Skip Links para acessibilidade */}
+      <SkipLinks />
+      
       {/* Sidebar */}
-      <Sidebar 
-        collapsed={sidebarCollapsed} 
-        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-      />
+      <div id="main-navigation">
+        <Sidebar 
+          collapsed={sidebarCollapsed} 
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
+      </div>
       
       {/* Main Content */}
       <div className={cn(
@@ -32,10 +38,24 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         />
         
         {/* Page Content */}
-        <main className="p-4 lg:p-6">
+        <main 
+          id="main-content"
+          className="p-4 lg:p-6"
+          role="main"
+          aria-label="Conteúdo principal"
+          tabIndex={-1}
+        >
           {children}
         </main>
       </div>
+      
+      {/* Região live para anúncios dinâmicos */}
+      <div 
+        id="live-region" 
+        aria-live="polite" 
+        aria-atomic="true" 
+        className="sr-only"
+      ></div>
     </div>
   );
 }

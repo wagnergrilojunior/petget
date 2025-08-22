@@ -1,23 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { UserInfo } from '@/services/auth';
 
 // Hook para gerenciar localStorage
 export function useLocalStorage<T>(key: string, initialValue: T) {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === 'undefined') {
-      return initialValue;
-    }
+  const [storedValue, setStoredValue] = useState<T>(initialValue);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
     
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error: unknown) {
-      console.error(`Erro ao ler localStorage key "${key}":`, error);
-      return initialValue;
+    if (typeof window !== 'undefined') {
+      try {
+        const item = window.localStorage.getItem(key);
+        if (item) {
+          setStoredValue(JSON.parse(item));
+        }
+      } catch (error: unknown) {
+        console.error(`Erro ao ler localStorage key "${key}":`, error);
+      }
     }
-  });
+  }, [key]);
 
   const setValue = (value: T | ((val: T) => T)) => {
     try {
@@ -51,8 +55,13 @@ export function useAuthState() {
   const [token, setToken, removeToken] = useLocalStorage<string | null>('token', null);
   const [user, setUser, removeUser] = useLocalStorage<UserInfo | null>('user', null);
   const [tenantId, setTenantId, removeTenantId] = useLocalStorage<string | null>('tenantId', null);
+  const [mounted, setMounted] = useState(false);
 
-  const isAuthenticated = !!token && !!user;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isAuthenticated = mounted && !!token && !!user;
 
   const clearAuth = () => {
     removeToken();

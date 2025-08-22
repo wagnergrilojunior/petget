@@ -3,9 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/enhanced-badge';
 import { Button } from '@/components/ui/button';
+import { KPICard, PetGetKPIs } from '@/components/organisms/KPICard';
+import { RevenueLineChart, ServicesPieChart, RevenuePieChart } from '@/components/organisms/Charts';
+import { RecentActivities, generateMockActivities } from '@/components/organisms/RecentActivities';
 import { AuthService, UserInfo } from '@/services/auth';
+import { ApiClient } from "@/lib/api"
 import {
   Users,
   Heart,
@@ -13,6 +17,10 @@ import {
   DollarSign,
   TrendingUp,
   Clock,
+  AlertCircle,
+  Plus,
+  Eye,
+  Edit,
 } from 'lucide-react';
 
 interface DashboardStats {
@@ -32,7 +40,9 @@ interface AgendamentoRecente {
   status: string;
 }
 
-export default function DashboardPage() {
+const DashboardPage = () => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
@@ -43,71 +53,33 @@ export default function DashboardPage() {
     agendamentosPendentes: 0,
   });
   const [agendamentosRecentes, setAgendamentosRecentes] = useState<AgendamentoRecente[]>([]);
-  const router = useRouter();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (!AuthService.isAuthenticated()) {
-        router.push('/login');
-        return;
-      }
-
-      const isValid = await AuthService.validateToken();
-      if (!isValid) {
-        AuthService.clearStorage();
-        router.push('/login');
-        return;
-      }
-
-      const userInfo = AuthService.getUserInfo();
-      setUser(userInfo);
-      await loadDashboardData();
-    };
-
-    checkAuth();
-  }, [router]);
 
   const loadDashboardData = async () => {
     try {
       setLoading(true);
       
-      // Mock data por enquanto - substituir por chamadas reais à API
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simula loading
-      
-      setStats({
-        totalClientes: 156,
-        totalPets: 234,
+      // Carrega estatísticas do dashboard
+      const dashboardStats = {
+        totalClientes: 150,
+        totalPets: 280,
         agendamentosHoje: 12,
-        faturamentoMes: 15750.00,
-        agendamentosPendentes: 8,
-      });
+        faturamentoMes: 15000,
+        agendamentosPendentes: 5,
+      };
+      setStats(dashboardStats);
       
-      setAgendamentosRecentes([
+      // Carrega agendamentos recentes (mock data)
+      const agendamentos = [
         {
           id: '1',
-          cliente: 'Maria Silva',
+          cliente: 'João Silva',
           pet: 'Rex',
           servico: 'Consulta',
           horario: '14:00',
           status: 'Confirmado'
-        },
-        {
-          id: '2',
-          cliente: 'João Santos',
-          pet: 'Mimi',
-          servico: 'Vacina',
-          horario: '15:30',
-          status: 'Pendente'
-        },
-        {
-          id: '3',
-          cliente: 'Ana Costa',
-          pet: 'Bella',
-          servico: 'Banho e Tosa',
-          horario: '16:00',
-          status: 'Confirmado'
         }
-      ]);
+      ];
+      setAgendamentosRecentes(agendamentos);
     } catch (error) {
       console.error('Erro ao carregar dados do dashboard:', error);
     } finally {
@@ -115,179 +87,158 @@ export default function DashboardPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await AuthService.logout();
-    router.push('/login');
-  };
+  useEffect(() => {
+    const initDashboard = async () => {
+      try {
+        if (!AuthService.isAuthenticated()) {
+          router.push('/login');
+          return;
+        }
 
-  if (loading) {
+        const isValid = await AuthService.validateToken();
+        if (!isValid) {
+          AuthService.clearStorage();
+          router.push('/login');
+          return;
+        }
+
+        const userInfo = AuthService.getUserInfo();
+        setUser(userInfo);
+        await loadDashboardData();
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Erro na inicialização:', error);
+        AuthService.clearStorage();
+        router.push('/login');
+      }
+    };
+
+    initDashboard();
+  }, [router]);
+
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-lg">Carregando dashboard...</div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
       </div>
     );
   }
 
-  if (!user) {
-    return null;
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-sm text-gray-600 mt-1">
-                Bem-vindo, {user.nome} - {user.empresaNome || 'PetGet'}
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Badge variant="secondary">{user.perfil}</Badge>
-              <Button onClick={handleLogout} variant="outline">
-                Sair
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Users className="h-6 w-6 text-blue-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Clientes</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalClientes}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Heart className="h-6 w-6 text-green-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Pets</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalPets}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <Calendar className="h-6 w-6 text-yellow-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Hoje</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.agendamentosHoje}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <DollarSign className="h-6 w-6 text-purple-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Faturamento</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    R$ {stats.faturamentoMes.toLocaleString('pt-BR')}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <Clock className="h-6 w-6 text-red-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Pendentes</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.agendamentosPendentes}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Dashboard
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Bem-vindo de volta, {user?.nome || 'Usuário'}!
+          </p>
         </div>
 
-        {/* Recent Appointments */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* KPIs */}
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+           <KPICard
+             title="Total de Clientes"
+             value={stats.totalClientes}
+             icon={Users}
+             trend={{ value: 12, label: "vs mês anterior", type: "up" }}
+           />
+           <KPICard
+             title="Total de Pets"
+             value={stats.totalPets}
+             icon={Heart}
+             trend={{ value: 8, label: "vs mês anterior", type: "up" }}
+           />
+           <KPICard
+             title="Agendamentos Hoje"
+             value={stats.agendamentosHoje}
+             icon={Calendar}
+             trend={{ value: 5, label: "vs ontem", type: "up" }}
+           />
+           <KPICard
+             title="Faturamento do Mês"
+             value={`R$ ${stats.faturamentoMes.toLocaleString()}`}
+             icon={DollarSign}
+             trend={{ value: 15, label: "vs mês anterior", type: "up" }}
+           />
+         </div>
+
+        {/* Charts */}
+         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+           <Card>
+             <CardHeader>
+               <CardTitle>Receita dos Últimos 6 Meses</CardTitle>
+             </CardHeader>
+             <CardContent>
+               <RevenueLineChart 
+                 data={[
+                   { name: 'Jan', value: 12000 },
+                   { name: 'Fev', value: 15000 },
+                   { name: 'Mar', value: 18000 },
+                   { name: 'Abr', value: 16000 },
+                   { name: 'Mai', value: 22000 },
+                   { name: 'Jun', value: 25000 },
+                 ]}
+               />
+             </CardContent>
+           </Card>
+           
+           <Card>
+             <CardHeader>
+               <CardTitle>Serviços Mais Realizados</CardTitle>
+             </CardHeader>
+             <CardContent>
+               <ServicesPieChart 
+                 data={[
+                   { name: 'Consultas', value: 45, color: '#3b82f6' },
+                   { name: 'Vacinas', value: 25, color: '#10b981' },
+                   { name: 'Banho e Tosa', value: 20, color: '#f59e0b' },
+                   { name: 'Cirurgias', value: 10, color: '#ef4444' },
+                 ]}
+               />
+             </CardContent>
+           </Card>
+         </div>
+
+        {/* Recent Activities */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Agendamentos Recentes</CardTitle>
+              <CardTitle>Atividades Recentes</CardTitle>
               <CardDescription>
-                Últimos agendamentos realizados
+                Últimas atividades do sistema
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RecentActivities activities={generateMockActivities()} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Agendamentos Pendentes</CardTitle>
+              <CardDescription>
+                {stats.agendamentosPendentes} agendamentos aguardando confirmação
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {agendamentosRecentes.map((agendamento) => (
-                  <div key={agendamento.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div key={agendamento.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div>
                       <p className="font-medium">{agendamento.cliente}</p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         {agendamento.pet} - {agendamento.servico}
                       </p>
-                      <p className="text-sm text-gray-500">{agendamento.horario}</p>
                     </div>
-                    <Badge 
-                      variant={agendamento.status === 'Confirmado' ? 'default' : 'secondary'}
-                    >
-                      {agendamento.status}
-                    </Badge>
+                    <div className="text-right">
+                      <p className="text-sm font-medium">{agendamento.horario}</p>
+                      <Badge variant="outline">{agendamento.status}</Badge>
+                    </div>
                   </div>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Ações Rápidas</CardTitle>
-              <CardDescription>
-                Acesso rápido às principais funcionalidades
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <Button className="h-20 flex flex-col" variant="outline" disabled>
-                  <Users className="h-6 w-6 mb-2" />
-                  <span>Novo Cliente</span>
-                </Button>
-                <Button className="h-20 flex flex-col" variant="outline" disabled>
-                  <Calendar className="h-6 w-6 mb-2" />
-                  <span>Agendar</span>
-                </Button>
-                <Button className="h-20 flex flex-col" variant="outline" disabled>
-                  <Heart className="h-6 w-6 mb-2" />
-                  <span>Novo Pet</span>
-                </Button>
-                <Button className="h-20 flex flex-col" variant="outline" disabled>
-                  <TrendingUp className="h-6 w-6 mb-2" />
-                  <span>Relatórios</span>
-                </Button>
               </div>
             </CardContent>
           </Card>
@@ -295,4 +246,6 @@ export default function DashboardPage() {
       </div>
     </div>
   );
-}
+};
+
+export default DashboardPage;

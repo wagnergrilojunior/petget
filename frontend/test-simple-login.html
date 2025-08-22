@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Login Simples</title>
+</head>
+<body>
+    <h1>Teste de Login Direto</h1>
+    <button id="testLogin">Testar Login</button>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('testLogin').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '🔄 Testando...';
+            
+            try {
+                console.log('🚀 Iniciando teste de login...');
+                
+                const response = await fetch('http://localhost:8080/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@clinicademo.com',
+                        senha: '123456'
+                    })
+                });
+                
+                console.log('📊 Status:', response.status);
+                console.log('📋 Headers:', [...response.headers.entries()]);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Sucesso:', data);
+                    resultDiv.innerHTML = `
+                        <h3>✅ Login bem-sucedido!</h3>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Token:</strong> ${data.accessToken ? 'Recebido' : 'Não recebido'}</p>
+                        <p><strong>Usuário:</strong> ${data.user ? data.user.nome : 'Não encontrado'}</p>
+                    `;
+                } else {
+                    const errorData = await response.text();
+                    console.error('❌ Erro:', response.status, errorData);
+                    resultDiv.innerHTML = `
+                        <h3>❌ Erro no login</h3>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Erro:</strong> ${errorData}</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('💥 Erro de rede:', error);
+                resultDiv.innerHTML = `
+                    <h3>💥 Erro de conectividade</h3>
+                    <p><strong>Tipo:</strong> ${error.name}</p>
+                    <p><strong>Mensagem:</strong> ${error.message}</p>
+                    <p>Verifique se o backend está rodando em http://localhost:8080</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
