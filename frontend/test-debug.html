@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Login - PetGet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .info {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Debug Login - PetGet</h1>
+        
+        <div class="info">
+            <strong>Informações do Ambiente:</strong><br>
+            <span id="env-info">Carregando...</span>
+        </div>
+        
+        <div>
+            <button onclick="testFetchDirect()">🧪 Testar fetch() direto</button>
+            <button onclick="testAxiosDirect()">🧪 Testar axios direto</button>
+            <button onclick="testCors()">🧪 Testar CORS</button>
+            <button onclick="clearResult()">🧹 Limpar</button>
+        </div>
+        
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        // Configurações
+        const API_BASE_URL = 'http://localhost:8080/api';
+        const LOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
+        const TEST_CREDENTIALS = {
+            email: 'admin@clinicademo.com',
+            senha: '123456'
+        };
+
+        // Elementos DOM
+        const resultDiv = document.getElementById('result');
+        const envInfo = document.getElementById('env-info');
+
+        // Atualizar informações do ambiente
+        function updateEnvInfo() {
+            envInfo.innerHTML = `
+                <strong>URL Base da API:</strong> ${API_BASE_URL}<br>
+                <strong>Endpoint de Login:</strong> ${LOGIN_ENDPOINT}<br>
+                <strong>Origem:</strong> ${window.location.origin}<br>
+                <strong>User Agent:</strong> ${navigator.userAgent.substring(0, 100)}...
+            `;
+        }
+
+        // Mostrar resultado
+        function showResult(content) {
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = content;
+            console.log('📋 Resultado:', content);
+        }
+
+        // Limpar resultado
+        function clearResult() {
+            resultDiv.style.display = 'none';
+            resultDiv.textContent = '';
+        }
+
+        // Teste com fetch direto
+        async function testFetchDirect() {
+            showResult('🔄 Testando fetch direto...');
+            
+            try {
+                console.log('🧪 Iniciando teste fetch direto');
+                console.log('🔧 URL:', LOGIN_ENDPOINT);
+                console.log('🔧 Credenciais:', { ...TEST_CREDENTIALS, senha: '***' });
+                
+                const response = await fetch(LOGIN_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(TEST_CREDENTIALS)
+                });
+                
+                console.log('📊 Response:', response);
+                console.log('📊 Status:', response.status);
+                console.log('📊 Headers:', [...response.headers.entries()]);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Dados recebidos:', data);
+                    showResult(`✅ SUCESSO com fetch()!\n\nStatus: ${response.status}\nURL: ${response.url}\nToken: ${data.accessToken ? 'Recebido' : 'Não recebido'}\nUsuário: ${data.user?.nome || 'Não encontrado'}\n\nResposta completa:\n${JSON.stringify(data, null, 2)}`);
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ Erro HTTP:', response.status, errorText);
+                    showResult(`❌ ERRO HTTP ${response.status}\n\nURL: ${response.url}\nStatus Text: ${response.statusText}\nResposta: ${errorText}`);
+                }
+            } catch (error) {
+                console.error('💥 Erro de rede:', error);
+                showResult(`💥 ERRO DE REDE\n\nTipo: ${error.name}\nMensagem: ${error.message}\nStack: ${error.stack}`);
+            }
+        }
+
+        // Teste com axios direto
+        async function testAxiosDirect() {
+            showResult('🔄 Testando axios direto...');
+            
+            try {
+                console.log('🧪 Iniciando teste axios direto');
+                
+                // Configurar axios
+                const axiosInstance = axios.create({
+                    baseURL: API_BASE_URL,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                // Interceptor para logs
+                axiosInstance.interceptors.request.use(
+                    (config) => {
+                        console.log('🔍 Axios Request Config:', config);
+                        console.log('🔍 URL completa:', `${config.baseURL}${config.url}`);
+                        return config;
+                    },
+                    (error) => {
+                        console.error('🔍 Axios Request Error:', error);
+                        return Promise.reject(error);
+                    }
+                );
+                
+                const response = await axiosInstance.post('/auth/login', TEST_CREDENTIALS);
+                
+                console.log('✅ Axios Response:', response);
+                showResult(`✅ SUCESSO com axios!\n\nStatus: ${response.status}\nURL: ${response.config.url}\nBase URL: ${response.config.baseURL}\nToken: ${response.data.accessToken ? 'Recebido' : 'Não recebido'}\nUsuário: ${response.data.user?.nome || 'Não encontrado'}\n\nResposta completa:\n${JSON.stringify(response.data, null, 2)}`);
+                
+            } catch (error) {
+                console.error('❌ Erro axios:', error);
+                const errorMsg = error.response 
+                    ? `HTTP ${error.response.status}: ${JSON.stringify(error.response.data, null, 2)}`
+                    : `Rede: ${error.message}`;
+                showResult(`❌ ERRO AXIOS\n\n${errorMsg}\n\nErro completo:\n${JSON.stringify(error, null, 2)}`);
+            }
+        }
+
+        // Teste de CORS
+        async function testCors() {
+            showResult('🔄 Testando CORS...');
+            
+            try {
+                console.log('🧪 Testando CORS com OPTIONS');
+                
+                const response = await fetch(LOGIN_ENDPOINT, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type',
+                    }
+                });
+                
+                console.log('📊 CORS Response:', response);
+                console.log('📊 CORS Headers:', [...response.headers.entries()]);
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers'),
+                };
+                
+                showResult(`🔍 TESTE DE CORS\n\nStatus: ${response.status}\nOrigin permitida: ${corsHeaders['Access-Control-Allow-Origin'] || 'Não definida'}\nMétodos permitidos: ${corsHeaders['Access-Control-Allow-Methods'] || 'Não definidos'}\nHeaders permitidos: ${corsHeaders['Access-Control-Allow-Headers'] || 'Não definidos'}\n\nTodos os headers CORS:\n${JSON.stringify(corsHeaders, null, 2)}`);
+                
+            } catch (error) {
+                console.error('💥 Erro CORS:', error);
+                showResult(`💥 ERRO CORS\n\nMensagem: ${error.message}\nDetalhes: ${JSON.stringify(error, null, 2)}`);
+            }
+        }
+
+        // Inicializar
+        updateEnvInfo();
+        console.log('🚀 Debug page carregada!');
+        console.log('🔧 Configurações:', { API_BASE_URL, LOGIN_ENDPOINT, TEST_CREDENTIALS: { ...TEST_CREDENTIALS, senha: '***' } });
+    </script>
+</body>
+</html>
