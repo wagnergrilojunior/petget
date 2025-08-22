@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: petget-postgres
+    environment:
+      POSTGRES_USER: petget
+      POSTGRES_PASSWORD: petget
+      POSTGRES_DB: petget
+    ports:
+      - "5432:5432"       # se já tiver um Postgres na 5432, troque para "5433:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U petget -d petget"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - petget_net
+
+  adminer:
+    image: adminer:latest
+    container_name: petget-adminer
+    ports:
+      - "8081:8080"       # UI para ver o banco (http://localhost:8081)
+    depends_on:
+      - postgres
+    networks:
+      - petget_net
+
+networks:
+  petget_net:
+    driver: bridge
+
+volumes:
+  pg_data:
