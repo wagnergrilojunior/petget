@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Node
+node_modules/
+.next/
+out/
+dist/
+
+# Java / Maven
+target/
+*.iml
+*.log
+
+# Env
+.env
+infra/.env
+frontend/.env.local
+backend/src/main/resources/application-*.yml
