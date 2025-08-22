@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { UserInfo } from '@/services/auth';
 
 // Hook para gerenciar localStorage
 export function useLocalStorage<T>(key: string, initialValue: T) {
@@ -12,7 +13,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     try {
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Erro ao ler localStorage key "${key}":`, error);
       return initialValue;
     }
@@ -26,7 +27,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Erro ao salvar no localStorage key "${key}":`, error);
     }
   };
@@ -37,7 +38,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       if (typeof window !== 'undefined') {
         window.localStorage.removeItem(key);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Erro ao remover localStorage key "${key}":`, error);
     }
   };
@@ -48,7 +49,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 // Hook para gerenciar autenticação
 export function useAuthState() {
   const [token, setToken, removeToken] = useLocalStorage<string | null>('token', null);
-  const [user, setUser, removeUser] = useLocalStorage<any>('user', null);
+  const [user, setUser, removeUser] = useLocalStorage<UserInfo | null>('user', null);
   const [tenantId, setTenantId, removeTenantId] = useLocalStorage<string | null>('tenantId', null);
 
   const isAuthenticated = !!token && !!user;
@@ -59,7 +60,7 @@ export function useAuthState() {
     removeTenantId();
   };
 
-  const setAuthData = (authToken: string, userData: any, userTenantId: string) => {
+  const setAuthData = (authToken: string, userData: UserInfo, userTenantId: string) => {
     setToken(authToken);
     setUser(userData);
     setTenantId(userTenantId);

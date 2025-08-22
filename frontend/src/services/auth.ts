@@ -84,7 +84,7 @@ api.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${response.accessToken}`;
           return api(originalRequest);
         }
-      } catch (refreshError) {
+      } catch {
         AuthService.logout();
         window.location.href = '/login';
       }
@@ -115,8 +115,13 @@ export class AuthService {
       this.setUserInfo(userInfo);
       
       return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Erro ao fazer login');
+    } catch (error: unknown) {
+      const errorMessage = error && typeof error === 'object' && 'response' in error && 
+        error.response && typeof error.response === 'object' && 'data' in error.response &&
+        error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
+        ? String(error.response.data.message)
+        : 'Erro ao fazer login';
+      throw new Error(errorMessage);
     }
   }
   
@@ -130,8 +135,13 @@ export class AuthService {
         request
       );
       return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Erro ao renovar token');
+    } catch (error: unknown) {
+      const errorMessage = error && typeof error === 'object' && 'response' in error && 
+        error.response && typeof error.response === 'object' && 'data' in error.response &&
+        error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
+        ? String(error.response.data.message)
+        : 'Erro ao renovar token';
+      throw new Error(errorMessage);
     }
   }
   
@@ -161,7 +171,7 @@ export class AuthService {
       
       const response = await api.get('/auth/validate');
       return response.status === 200;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

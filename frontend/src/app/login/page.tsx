@@ -22,8 +22,9 @@ export default function LoginPage() {
     try {
       await AuthService.login({ email, senha });
       router.push('/dashboard');
-    } catch (error: any) {
-      setError(error.message || 'Erro ao fazer login');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao fazer login';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

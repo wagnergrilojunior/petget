@@ -60,12 +60,12 @@ export class ApiService {
     return response.data;
   }
 
-  static async post<T>(url: string, data?: any): Promise<ApiResponse<T>> {
+  static async post<T>(url: string, data?: unknown): Promise<ApiResponse<T>> {
     const response = await api.post<ApiResponse<T>>(url, data);
     return response.data;
   }
 
-  static async put<T>(url: string, data?: any): Promise<ApiResponse<T>> {
+  static async put<T>(url: string, data?: unknown): Promise<ApiResponse<T>> {
     const response = await api.put<ApiResponse<T>>(url, data);
     return response.data;
   }
@@ -75,7 +75,7 @@ export class ApiService {
     return response.data;
   }
 
-  static async getPaginated<T>(url: string, params?: any): Promise<PaginatedResponse<T>> {
+  static async getPaginated<T>(url: string, params?: Record<string, unknown>): Promise<PaginatedResponse<T>> {
     const response = await api.get<PaginatedResponse<T>>(url, { params });
     return response.data;
   }
@@ -103,11 +103,11 @@ export class ApiService {
     return this.get(`/clientes/${id}`);
   }
 
-  static async createCliente(data: any) {
+  static async createCliente(data: Record<string, unknown>) {
     return this.post('/clientes', data);
   }
 
-  static async updateCliente(id: string, data: any) {
+  static async updateCliente(id: string, data: Record<string, unknown>) {
     return this.put(`/clientes/${id}`, data);
   }
 
@@ -125,11 +125,11 @@ export class ApiService {
     return this.get(`/pets/${id}`);
   }
 
-  static async createPet(data: any) {
+  static async createPet(data: Record<string, unknown>) {
     return this.post('/pets', data);
   }
 
-  static async updatePet(id: string, data: any) {
+  static async updatePet(id: string, data: Record<string, unknown>) {
     return this.put(`/pets/${id}`, data);
   }
 
@@ -147,11 +147,11 @@ export class ApiService {
     return this.get(`/usuarios/${id}`);
   }
 
-  static async createUsuario(data: any) {
+  static async createUsuario(data: Record<string, unknown>) {
     return this.post('/usuarios', data);
   }
 
-  static async updateUsuario(id: string, data: any) {
+  static async updateUsuario(id: string, data: Record<string, unknown>) {
     return this.put(`/usuarios/${id}`, data);
   }
 
@@ -164,7 +164,7 @@ export class ApiService {
     return this.get('/empresa');
   }
 
-  static async updateEmpresa(data: any) {
+  static async updateEmpresa(data: Record<string, unknown>) {
     return this.put('/empresa', data);
   }
 }

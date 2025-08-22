@@ -78,14 +78,14 @@ export default function Layout({ children }: LayoutProps) {
 
           <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-600 hidden sm:block">
-              {user?.empresa?.nome}
+              {user?.empresaNome || 'PetGet'}
             </span>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.fotoUrl} alt={user?.nome} />
+                    <AvatarImage src="" alt={user?.nome} />
                     <AvatarFallback>
                       {user?.nome?.charAt(0)?.toUpperCase()}
                     </AvatarFallback>

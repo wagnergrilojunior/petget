@@ -18,7 +18,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-export function AuthProvider({ children }: AuthProviderProps) {
+export function useAuthState() {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -74,16 +74,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const value: AuthContextType = {
+  return {
     user,
     login,
     logout,
     isAuthenticated,
     loading,
   };
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
+  const authState = useAuthState();
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={authState}>
       {children}
     </AuthContext.Provider>
   );
