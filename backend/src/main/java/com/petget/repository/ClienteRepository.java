@@ -18,6 +18,24 @@ import java.util.Optional;
 public interface ClienteRepository extends BaseRepository<Cliente> {
     
     /**
+     * Busca uma entidade por ID e tenant ID
+     * @param id ID da entidade
+     * @param tenantId ID do tenant
+     * @return Optional da entidade
+     */
+    @Query("SELECT c FROM Cliente c WHERE c.id = :id AND c.tenantId = :tenantId")
+    Optional<Cliente> findByIdAndTenantId(@Param("id") Long id, @Param("tenantId") String tenantId);
+    
+    /**
+     * Busca todas as entidades do tenant com paginação
+     * @param tenantId ID do tenant
+     * @param pageable Configuração de paginação
+     * @return Página de entidades
+     */
+    @Query("SELECT c FROM Cliente c WHERE c.tenantId = :tenantId")
+    Page<Cliente> findByTenantId(@Param("tenantId") String tenantId, Pageable pageable);
+    
+    /**
      * Busca clientes por nome (case insensitive)
      * @param nome Nome ou parte do nome
      * @param tenantId ID do tenant

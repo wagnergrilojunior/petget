@@ -1,41 +1,70 @@
-# API Endpoints - PetGet
+# API Endpoints – PetGet
 
-## Autenticação
-- `POST /auth/login` → login do usuário
-- `POST /auth/register` → cadastro de usuário
-- `POST /auth/refresh` → renovação de token
+## Autenticação & Usuários
+- `POST /auth/login` – autenticação com JWT
+- `POST /auth/refresh` – refresh token
+- `POST /auth/register` – criação de usuário
+- `GET /users` – listar usuários
+- `GET /users/{id}` – detalhes
+- `PUT /users/{id}` – atualizar
+- `DELETE /users/{id}` – remover
+
+## Empresas
+- `POST /companies` – criar empresa
+- `GET /companies` – listar
+- `GET /companies/{id}` – detalhes
+- `PUT /companies/{id}` – atualizar
+- `DELETE /companies/{id}` – excluir
 
 ## Clientes
-- `GET /clients` → listar clientes
-- `POST /clients` → criar cliente
-- `GET /clients/{id}` → buscar cliente
-- `PUT /clients/{id}` → atualizar cliente
-- `DELETE /clients/{id}` → remover cliente
+- `POST /clients` – criar cliente
+- `GET /clients` – listar clientes
+- `GET /clients/{id}` – detalhes
+- `PUT /clients/{id}` – atualizar
+- `DELETE /clients/{id}` – excluir
 
 ## Pets
-- `GET /pets` → listar pets
-- `POST /pets` → criar pet
-- `GET /pets/{id}` → buscar pet
-- `PUT /pets/{id}` → atualizar pet
-- `DELETE /pets/{id}` → remover pet
+- `POST /pets` – criar pet
+- `GET /pets` – listar pets
+- `GET /pets/{id}` – detalhes
+- `PUT /pets/{id}` – atualizar
+- `DELETE /pets/{id}` – excluir
 
-## Agenda
-- `GET /appointments` → listar agendamentos
-- `POST /appointments` → criar agendamento
-- `PUT /appointments/{id}/status` → alterar status (pendente, concluído, cancelado)
+## Prontuário
+- `POST /records/{petId}` – adicionar registro
+- `GET /records/{petId}` – listar registros do pet
+- `GET /records/{recordId}` – detalhes do registro
+- `DELETE /records/{recordId}` – excluir registro
 
-## Produtos
-- `GET /products` → listar produtos
-- `POST /products` → criar produto
-- `PUT /products/{id}` → atualizar produto
-- `DELETE /products/{id}` → remover produto
+## Agenda & Serviços
+- `POST /appointments` – criar agendamento
+- `GET /appointments` – listar agendamentos
+- `PUT /appointments/{id}` – atualizar agendamento
+- `DELETE /appointments/{id}` – cancelar agendamento
+
+## Produtos & Estoque
+- `POST /products` – criar produto
+- `GET /products` – listar produtos
+- `PUT /products/{id}` – atualizar produto
+- `DELETE /products/{id}` – excluir produto
+- `POST /inventory/movements` – lançar movimentação de estoque
+- `GET /inventory/movements` – listar movimentações
+
+## Vendas & Faturamento
+- `POST /sales` – registrar venda
+- `GET /sales` – listar vendas
+- `GET /sales/{id}` – detalhes da venda
+- `POST /invoices` – emitir fatura (Asaas)
+- `GET /invoices` – listar faturas
 
 ## Financeiro
-- `GET /finance/invoices` → listar faturas
-- `POST /finance/invoices` → criar fatura
-- `GET /finance/cashflow` → fluxo de caixa
+- `POST /financial/payables` – criar conta a pagar
+- `POST /financial/receivables` – criar conta a receber
+- `GET /financial/payables` – listar contas a pagar
+- `GET /financial/receivables` – listar contas a receber
+- `POST /financial/webhooks/asaas` – receber webhook do Asaas
 
-## Integrações
-- `GET /integrations/viacep/{cep}` → buscar endereço
-- `POST /integrations/asaas/payment` → gerar pagamento
-- `POST /integrations/whatsapp/send` → enviar mensagem
+## Relatórios
+- `GET /reports/finance` – fluxo de caixa
+- `GET /reports/sales` – vendas consolidadas
+- `GET /reports/stock` – giro de estoque

@@ -61,6 +61,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                         
+                        // Valida o tenant ID do header com o do token
+                        String headerTenantId = request.getHeader("X-Tenant-ID");
+                        if (StringUtils.hasText(headerTenantId) && !headerTenantId.equals(tenantId)) {
+                            logger.warn("Tentativa de acesso cruzado detectada! Token tenant: {}, Header tenant: {}", tenantId, headerTenantId);
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.getWriter().write("{\"error\":\"Acesso negado: tenant inválido\"}");
+                            return;
+                        }
+                        
                         // Define o tenant no contexto
                         if (StringUtils.hasText(tenantId)) {
                             TenantContext.setCurrentTenant(tenantId);

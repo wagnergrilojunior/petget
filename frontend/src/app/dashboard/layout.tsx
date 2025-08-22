@@ -30,7 +30,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className={cn(
         "transition-all duration-300 ease-in-out",
         sidebarCollapsed ? "ml-16" : "ml-64",
-        "lg:ml-64 lg:ml-16" // Responsive: sempre colapsada em mobile
+        "md:ml-16" // Responsive: sempre colapsada em mobile
       )}>
         {/* Header */}
         <Header 
