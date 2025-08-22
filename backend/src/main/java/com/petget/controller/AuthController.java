@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  * Gerencia login, logout e refresh de tokens JWT.
  */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @Tag(name = "Autenticação", description = "Endpoints para autenticação de usuários")
 public class AuthController {
     
