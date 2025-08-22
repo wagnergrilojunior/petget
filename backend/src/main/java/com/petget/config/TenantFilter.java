@@ -26,6 +26,9 @@ public class TenantFilter {
             Session session = entityManager.unwrap(Session.class);
             Filter filter = session.enableFilter("tenantFilter");
             filter.setParameter("tenantId", tenantId);
+            System.out.println("[DEBUG] Filtro de tenant aplicado: " + tenantId);
+        } else {
+            System.out.println("[DEBUG] Nenhum tenant no contexto para aplicar filtro");
         }
     }
     

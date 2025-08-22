@@ -1,0 +1,179 @@
+/* Tokens de cores para o dashboard PetGet */
+:root {
+  /* Cores principais da sidebar */
+  --sidebar-bg-start: #1d4ed8;
+  --sidebar-bg-end: #2563eb;
+  --sidebar-text: #ffffff;
+  --sidebar-text-hover: #e5e7eb;
+  --sidebar-icon: #ffffff;
+  --sidebar-active-bg: rgba(255, 255, 255, 0.1);
+  
+  /* Cores do topbar */
+  --topbar-bg: #ffffff;
+  --topbar-border: #e5e7eb;
+  --topbar-text: #374151;
+  --topbar-icon: #6b7280;
+  --topbar-icon-hover: #374151;
+  
+  /* Cores dos cards */
+  --card-bg: #ffffff;
+  --card-border: #f3f4f6;
+  --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --card-title: #6b7280;
+  --card-value: #111827;
+  --card-trend-positive: #10b981;
+  --card-trend-negative: #ef4444;
+  
+  /* Cores dos gráficos */
+  --chart-primary: #3b82f6;
+  --chart-secondary: #93c5fd;
+  --chart-grid: #f3f4f6;
+  --chart-text: #6b7280;
+  
+  /* Cores das badges de status */
+  --badge-internacao-bg: #10b981;
+  --badge-internacao-text: #ffffff;
+  --badge-vacinacao-bg: #3b82f6;
+  --badge-vacinacao-text: #ffffff;
+  --badge-checkup-bg: #6b7280;
+  --badge-checkup-text: #ffffff;
+  --badge-cirurgia-bg: #f59e0b;
+  --badge-cirurgia-text: #ffffff;
+  --badge-odontologia-bg: #8b5cf6;
+  --badge-odontologia-text: #ffffff;
+  --badge-exames-bg: #ef4444;
+  --badge-exames-text: #ffffff;
+  
+  /* Cores da tabela */
+  --table-header-bg: #f9fafb;
+  --table-header-text: #374151;
+  --table-row-hover: #f9fafb;
+  --table-border: #e5e7eb;
+  
+  /* Cores de fundo */
+  --dashboard-bg: #f9fafb;
+  --content-bg: #ffffff;
+  
+  /* Tipografia */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  
+  /* Espaçamentos */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Bordas */
+  --border-radius-sm: 0.375rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-xl: 1rem;
+  --border-radius-2xl: 1.5rem;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Cores principais da sidebar (mantém azul) */
+    --sidebar-bg-start: #1e40af;
+    --sidebar-bg-end: #1d4ed8;
+    
+    /* Cores do topbar */
+    --topbar-bg: #1f2937;
+    --topbar-border: #374151;
+    --topbar-text: #f9fafb;
+    --topbar-icon: #9ca3af;
+    --topbar-icon-hover: #f9fafb;
+    
+    /* Cores dos cards */
+    --card-bg: #1f2937;
+    --card-border: #374151;
+    --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+    --card-title: #9ca3af;
+    --card-value: #f9fafb;
+    
+    /* Cores dos gráficos */
+    --chart-grid: #374151;
+    --chart-text: #9ca3af;
+    
+    /* Cores da tabela */
+    --table-header-bg: #374151;
+    --table-header-text: #f9fafb;
+    --table-row-hover: #374151;
+    --table-border: #4b5563;
+    
+    /* Cores de fundo */
+    --dashboard-bg: #111827;
+    --content-bg: #1f2937;
+  }
+}
+
+/* Classes utilitárias */
+.sidebar-gradient {
+  background: linear-gradient(135deg, var(--sidebar-bg-start), var(--sidebar-bg-end));
+}
+
+.card-shadow {
+  box-shadow: var(--card-shadow);
+}
+
+.badge-internacao {
+  background-color: var(--badge-internacao-bg);
+  color: var(--badge-internacao-text);
+}
+
+.badge-vacinacao {
+  background-color: var(--badge-vacinacao-bg);
+  color: var(--badge-vacinacao-text);
+}
+
+.badge-checkup {
+  background-color: var(--badge-checkup-bg);
+  color: var(--badge-checkup-text);
+}
+
+.badge-cirurgia {
+  background-color: var(--badge-cirurgia-bg);
+  color: var(--badge-cirurgia-text);
+}
+
+.badge-odontologia {
+  background-color: var(--badge-odontologia-bg);
+  color: var(--badge-odontologia-text);
+}
+
+.badge-exames {
+  background-color: var(--badge-exames-bg);
+  color: var(--badge-exames-text);
+}
+
+/* Animações */
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}
+
+.hover-scale {
+  transition: transform 0.2s ease-in-out;
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  :root {
+    --spacing-md: 0.75rem;
+    --spacing-lg: 1rem;
+    --spacing-xl: 1.5rem;
+  }
+}

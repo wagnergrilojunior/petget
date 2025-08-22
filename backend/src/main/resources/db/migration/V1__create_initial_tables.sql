@@ -105,6 +105,27 @@ CREATE INDEX idx_pets_especie ON pets(especie);
 CREATE INDEX idx_pets_ativo ON pets(ativo);
 CREATE INDEX idx_pets_microchip ON pets(microchip);
 
+-- Tabela de produtos
+CREATE TABLE produtos (
+    id BIGSERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    categoria VARCHAR(20) NOT NULL CHECK (categoria IN ('RACAO', 'MEDICAMENTO', 'BRINQUEDO', 'ACESSORIO', 'HIGIENE', 'OUTRO')),
+    preco DECIMAL(10,2) NOT NULL,
+    estoque_atual INTEGER NOT NULL DEFAULT 0,
+    estoque_minimo INTEGER NOT NULL DEFAULT 0,
+    ativo BOOLEAN NOT NULL DEFAULT true,
+    tenant_id VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices para produtos
+CREATE INDEX idx_produtos_tenant_id ON produtos(tenant_id);
+CREATE INDEX idx_produtos_nome ON produtos(nome);
+CREATE INDEX idx_produtos_categoria ON produtos(categoria);
+CREATE INDEX idx_produtos_ativo ON produtos(ativo);
+
 -- Função para atualizar updated_at automaticamente
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -119,6 +140,7 @@ CREATE TRIGGER update_empresas_updated_at BEFORE UPDATE ON empresas FOR EACH ROW
 CREATE TRIGGER update_usuarios_updated_at BEFORE UPDATE ON usuarios FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_clientes_updated_at BEFORE UPDATE ON clientes FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_pets_updated_at BEFORE UPDATE ON pets FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_produtos_updated_at BEFORE UPDATE ON produtos FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Inserção de dados iniciais
 -- Empresa de demonstração

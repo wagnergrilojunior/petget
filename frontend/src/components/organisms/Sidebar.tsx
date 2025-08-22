@@ -69,7 +69,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       {/* Mobile Overlay */}
       {!collapsed && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
           onClick={onToggle}
           aria-hidden="true"
         />
@@ -80,8 +80,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         className={cn(
           "fixed top-0 left-0 z-50 h-full bg-sidebar border-r border-border transition-all duration-300 ease-in-out shadow-lg",
           collapsed ? "w-16" : "w-64",
-          "lg:translate-x-0",
-          collapsed ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          "md:translate-x-0",
+          collapsed ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
         role="navigation"
         aria-label="Menu principal de navegação"

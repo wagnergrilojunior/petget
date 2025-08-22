@@ -8,7 +8,7 @@ const FRONTEND_URL = 'http://localhost:3000';
 async function testBackendHealth() {
   console.log('🔍 Testando saúde do backend...');
   try {
-    const response = await axios.get(`${BACKEND_URL}/health`);
+    const response = await axios.get(`${BACKEND_URL}/actuator/health`);
     console.log('✅ Backend está funcionando:', response.data);
     return true;
   } catch (error) {
